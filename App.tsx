@@ -6,33 +6,43 @@
  */
 
 import React from 'react';
-import {Button, SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import { Button, SafeAreaView, StatusBar } from 'react-native';
 
-import {generateTestCrash} from 'appcenter-crashes';
+import {
+  generateTestCrash,
+  hasCrashedInLastSession,
+  lastSessionCrashReport,
+} from 'appcenter-crashes';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Analytics from 'appcenter-analytics';
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+export default class App extends React.Component {
+  constructor() {
+    super();
+    this.checkPreviousSession();
+  }
+  async checkPreviousSession() {
+    const didCrash = await hasCrashedInLastSession();
+    if (didCrash) {
+      const raport = await lastSessionCrashReport();
+      alert("Sorry about that crash, we're working on a solution.");
+    }
+  }
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <Button
-        title="Crash!"
-        onPress={() => {
-          generateTestCrash();
-        }}
-      />
-    </SafeAreaView>
-  );
+  render() {
+    return (
+      <SafeAreaView>
+        <StatusBar />
+        <Button
+          title="Calculate Inflation"
+          onPress={() => {
+            Analytics.trackEvent('calculate_inflation', {
+              internet: 'WiFi',
+              gps: 'off',
+            });
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
 }
-
-export default App;
