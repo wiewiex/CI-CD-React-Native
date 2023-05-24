@@ -1,1 +1,3 @@
 # CICDReactNative
+
+InflationCalculator
